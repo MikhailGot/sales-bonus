@@ -52,7 +52,11 @@ function analyzeSalesData(data, options) {
 
     // @TODO: Подготовка итоговой коллекции с нужными полями
 	
-	if( !data || !data.customers || !data.products || !data.sellers || !data.purchase_records ||
+	if( !data || 
+		!data.customers || !data.customers.length ||
+		!data.products ||  !data.products.length ||
+		!data.sellers ||   !data.sellers.length ||
+		!data.purchase_records || !data.purchase_records.length ||
 		"object" != typeof(options) ||
 		!options.calculateRevenue || 
 		"function" != typeof(options.calculateRevenue) ||
@@ -107,14 +111,14 @@ function analyzeSalesData(data, options) {
 		return {
 			"seller_id": seller.id,
 			"name": `${seller.first_name} ${seller.last_name}`,
-			"revenue": seller.revenue.toFixed(2),
-			"profit": seller.profit.toFixed(2),
+			"revenue": Number(seller.revenue.toFixed(2)),
+			"profit": Number(seller.profit.toFixed(2)),
 			"sales_count": seller.sales_count,
 			"top_products": sortableProductsSold.slice(0,10),
 			"bonus": 0
 		};
 	});
 	sellerStats.sort((a,b) => b["profit"] - a["profit"]);
-	sellerStats.forEach((seller,index) => seller.bonus = options.calculateBonus(index,sellerStats.length,seller).toFixed(2));
+	sellerStats.forEach((seller,index) => seller.bonus = Number(options.calculateBonus(index,sellerStats.length,seller).toFixed(2)));
 	return sellerStats;
 }
