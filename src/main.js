@@ -77,7 +77,7 @@ function analyzeSalesData(data, options) {
 	data.purchase_records.forEach(record => {
         const seller = sellerIndex[record.seller_id];
 		seller.sales_count++;
-		
+		seller.revenue += record.total_amount;
         // Увеличить количество продаж 
         // Увеличить общую сумму всех продаж
 
@@ -92,7 +92,6 @@ function analyzeSalesData(data, options) {
             // Посчитать прибыль: выручка минус себестоимость
         // Увеличить общую накопленную прибыль (profit) у продавца  
 			seller.profit += profit;
-			seller.revenue += revenue;
             // Учёт количества проданных товаров
             if (!seller.products_sold[item.sku]) {
                 seller.products_sold[item.sku] = item.quantity;
@@ -100,8 +99,7 @@ function analyzeSalesData(data, options) {
 				seller.products_sold[item.sku] += item.quantity;
 			};
             // По артикулу товара увеличить его проданное количество у продавца
-        });
-		
+        });		
 	});
 	
 	const sellerStats = data.sellers.map(function(item){
@@ -111,14 +109,14 @@ function analyzeSalesData(data, options) {
 		return {
 			"seller_id": seller.id,
 			"name": `${seller.first_name} ${seller.last_name}`,
-			"revenue": seller.revenue,
-			"profit": seller.profit,
+			"revenue": seller.revenue.toFixed(2),
+			"profit": seller.profit.toFixed(2),
 			"sales_count": seller.sales_count,
 			"top_products": sortableProductsSold.slice(0,10),
 			"bonus": 0
 		};
 	});
 	sellerStats.sort((a,b) => b["profit"] - a["profit"]);
-	sellerStats.forEach((seller,index) => seller.bonus = options.calculateBonus(index,sellerStats.length,seller));
+	sellerStats.forEach((seller,index) => seller.bonus = options.calculateBonus(index,sellerStats.length,seller).toFixed(2));
 	return sellerStats;
 }
